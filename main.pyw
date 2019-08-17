@@ -146,6 +146,7 @@ def OnKeyboardEvent(event):
 
 
     testfunction()
+    ConvertToTable()
     return True
 
 
@@ -166,7 +167,7 @@ def main():
   hm.KeyDown = OnKeyboardEvent
 
   hm.HookKeyboard()
-  ConvertToTable()
+
 
   pythoncom.PumpMessages()
 
