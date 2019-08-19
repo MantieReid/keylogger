@@ -8,7 +8,6 @@ import pythoncom
 from datetime import datetime
 import  pandas as pd
 import win32gui
-import pdfkit
 import PySimpleGUI as sg
 
 
