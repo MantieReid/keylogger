@@ -22,13 +22,14 @@ def ConvertToTable():
     return
 
 
-  df = pd.read_csv(f, sep='|',encoding= "ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"] )
   try:
+    df = pd.read_csv(f, sep='|', encoding="ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"])
     df.to_csv(datelogname +'-LogFileTable.csv', index=None,)
   except PermissionError:
     print("User has opened the table file, they still have it opened. Which means we cannot open it.  ")
     print("They need to close the file or we cannot access it. ")
-    sg.PopupError('Hey! Close out the Table file! I cant write to the table as long as you have it open')
+
+    sg.PopupOk('Hey! Close out the Table file! I cant write to the table as long as you have it open')
 
 
 
