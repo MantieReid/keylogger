@@ -9,6 +9,7 @@ from datetime import datetime
 import  pandas as pd
 import win32gui
 import PySimpleGUI as sg
+import PySimpleGUI
 
 
 # converts the text file to a table with headers.
