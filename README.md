@@ -6,8 +6,9 @@ This is a program that is made in python. Its a a program that enables the user 
 •	Timestamped keystrokes. 
 
 •	Documents the window the keystrokes were typed in. 
-
 •	Keystrokes are logged in a textfile and in a csv table. 
+• Keystrokes are emailed to the user after 100 keystrokes. 
+
 
 # Known Errors
 
