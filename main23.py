@@ -10,8 +10,6 @@ from datetime import datetime
 import pandas as pd
 import win32gui
 import os
-import zipfile
-import  portalocker
 from stat import S_IREAD, S_IRGRP, S_IROTH
 import smtplib
 from email.mime.text import MIMEText
@@ -20,7 +18,6 @@ from email.mime.base import MIMEBase
 from email import encoders
 import threading
 from threading import Thread
-from filelock import Timeout, FileLock
 from stat import S_IWUSR
 
 
