@@ -11,9 +11,3 @@ This is a program that is made in python. Its a a program that enables the user 
 
 • Keystrokes are emailed to the user after 100 keystrokes. 
 
-
-# Known Errors
-
-•	The program sometimes has to be run as admin.
-
-
