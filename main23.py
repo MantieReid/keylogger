@@ -36,7 +36,7 @@ path_for_logs = os.path.join('LogFolders', 'logs')  # defined globally
 def convert_to_table():
   date_log_name = datetime.today().strftime('%m-%d-%Y')  # to be used for naming the log with the date in it.
 
-  if not os.path.exists(path_for_logs):  # if folder for the logs does exist, then create it.
+  if not os.path.exists(path_for_logs):  # if folder for the logs does NOT exist, then create it.
     os.makedirs(path_for_logs)
 
   location_of_file_and_name_for_logs = os.path.join(path_for_logs, date_log_name + "-logfile.txt")
