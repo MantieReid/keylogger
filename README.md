@@ -12,4 +12,7 @@ This is a program that is made in python. Its a a program that enables the user 
 • Keystrokes are emailed to the user after 100 keystrokes. 
 
 ![alt text](https://github.com/MantieReid/keylogger/blob/master/LVPkxRNupG.gif)
+![alt text](https://github.com/MantieReid/keylogger/blob/master/chrome_suBq4cCmM9.png)
+![alt text](https://github.com/MantieReid/keylogger/blob/master/notepad_his9SHDuZZ.png)
+
 
